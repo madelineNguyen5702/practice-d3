@@ -1,0 +1,27 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  margin: 0 auto;
+}
+#bar-section,
+#circle-section,
+#pie-section,
+#Scatter-section,
+#Line-section {
+  display: flex;
+  font-size: larger;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  max-height: min-content;
+}
+svg {
+  height: auto;
+}
+.rect:hover {
+  opacity: 0.5;
+}
