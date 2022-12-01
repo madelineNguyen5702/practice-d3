@@ -1,9 +1,17 @@
+import { barData, dataUrl } from "../data/barData.js";
 import BarConfig from "./configuration/BarConfig.js";
-
 document.getElementById("bar-section").innerHTML = `
 <h1>Bar Chart Here</h1>
 `;
 var { margin, height, width } = BarConfig;
+
+let dataAxios = "";
+axios
+  .get("https://query.data.world/s/hj7a6jusamaf4oxowc2nv44idjgiwu")
+  .then((res) => {
+    console.log(res.data);
+  })
+  .catch((err) => {});
 
 // append the svg object to the body of the page
 var svg = d3
@@ -14,58 +22,48 @@ var svg = d3
   .append("g")
   .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-// get the data
+// Parse the Data
 d3.csv(
-  "https://raw.githubusercontent.com/holtzy/data_to_viz/master/Example_dataset/1_OneNum.csv",
+  // import csv
+  "https://query.data.world/s/hj7a6jusamaf4oxowc2nv44idjgiwu",
   function (data) {
-    // X axis: scale and draw:
+    // X axis
     var x = d3
-      .scaleLinear()
-      .domain([0, 1000]) // can use this instead of 1000 to have the max of data: d3.max(data, function(d) { return +d.price })
-      .range([0, width]);
+      .scaleBand()
+      .range([0, width])
+      .domain(
+        data.map(function (d) {
+          return d.Country;
+        })
+      )
+      .padding(0.2);
     svg
       .append("g")
       .attr("transform", "translate(0," + height + ")")
-      .call(d3.axisBottom(x));
-
-    // set the parameters for the histogram
-    var histogram = d3
-      .histogram()
-      .value(function (d) {
-        return d.price;
-      }) // I need to give the vector of value
-      .domain(x.domain()) // then the domain of the graphic
-      .thresholds(x.ticks(70)); // then the numbers of bins
-
-    // And apply this function to data to get the bins
-    var bins = histogram(data);
-
-    // Y axis: scale and draw:
-    var y = d3.scaleLinear().range([height, 0]);
-    y.domain([
-      0,
-      d3.max(bins, function (d) {
-        return d.length;
-      }),
-    ]); // d3.hist has to be called before the Y axis obviously
+      .call(d3.axisBottom(x))
+      .selectAll("text")
+      .attr("transform", "translate(-10,0)rotate(-45)")
+      .style("text-anchor", "end");
+    // Add Y axis
+    var y = d3.scaleLinear().domain([0, 13000]).range([height, 0]);
     svg.append("g").call(d3.axisLeft(y));
 
-    // append the bar rectangles to the svg element
+    // Bars
     svg
-      .selectAll("rect")
-      .data(bins)
+      .selectAll("mybar")
+      .data(data)
       .enter()
       .append("rect")
-      .attr("x", 1)
-      .attr("transform", function (d) {
-        return "translate(" + x(d.x0) + "," + y(d.length) + ")";
+      .attr("x", function (d) {
+        return x(d.Country);
       })
-      .attr("width", function (d) {
-        return x(d.x1) - x(d.x0) - 1;
+      .attr("y", function (d) {
+        return y(d.Value);
       })
+      .attr("width", x.bandwidth())
       .attr("height", function (d) {
-        return height - y(d.length);
+        return height - y(d.Value);
       })
-      .style("fill", "#69b3a2");
+      .attr("fill", "#69b3a2");
   }
 );

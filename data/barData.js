@@ -7,3 +7,5 @@ export const barData = [
   { name: "Christina", score: 75 },
   { name: "Michael", score: 86 },
 ];
+export const dataUrl =
+  "https://data.world/associatedpress/johns-hopkins-coronavirus-case-tracker/workspace/file?filename=3_cases_and_deaths_by_state_timeseries.csv";
